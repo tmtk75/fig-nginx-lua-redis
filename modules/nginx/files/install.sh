@@ -38,6 +38,6 @@ make install
 cd /usr/local/nginx
 git clone https://github.com/openresty/lua-resty-redis.git
 
-export LD_LIBRARY_PATH=/usr/local/luajit/lib:$LD_LIBRARY_PATH
-/usr/local/nginx/sbin/nginx
+#export LD_LIBRARY_PATH=/usr/local/luajit/lib:$LD_LIBRARY_PATH
+#/usr/local/nginx/sbin/nginx
 
