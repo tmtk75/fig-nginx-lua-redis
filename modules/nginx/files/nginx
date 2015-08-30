@@ -1,0 +1,15 @@
+export LD_LIBRARY_PATH=/usr/local/luajit/lib:$LD_LIBRARY_PATH
+
+start() {
+  /usr/local/nginx/sbin/nginx
+}
+
+stop() {
+  /usr/local/nginx/sbin/nginx -s stop
+}
+
+restart() {
+  /usr/local/nginx/sbin/nginx -s reload
+}
+
+$1

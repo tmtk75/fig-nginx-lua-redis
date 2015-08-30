@@ -1,0 +1,6 @@
+.*.swp
+node_modules
+dump.rdb
+npm-debug.log
+.vagrant
+lua-resty-redis

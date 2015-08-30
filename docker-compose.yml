@@ -1,0 +1,97 @@
+#
+#                                     |             |
+#                                     |             |
+#                 +------- <<   nginx1:8080    nginx2:8080 
+#                 |                   |             |
+#                 |                   |             |
+#                 |          +--------+------+------+--------+
+#                 |          ^               v               ^
+#                 |          ^               v               ^
+#                 |        read            write            read
+#                 |          ^               v               ^
+#                 |          ^               v               ^
+#                 |     slave:6379 ---> master:6379 <--- slave:6379
+#                 |
+#         +-------+-------+
+#         |               |
+#         v               v
+#   server1:3000     server2:3000
+#
+##
+## nginx
+##
+nginx1:
+  image: danday74/nginx-lua
+  volumes:
+    - ./nginx.conf:/nginx/conf/nginx.conf:ro
+    - ./:/opt
+  links:
+    - redismaster:redismaster
+    - redisslave1:redisslave
+    - server1:server1
+    - server2:server2
+  ports:
+    - "8080:8080"         
+
+nginx2:
+  image: danday74/nginx-lua
+  volumes:
+    - ./nginx.conf:/nginx/conf/nginx.conf:ro
+    - ./:/opt
+  links:
+    - redismaster:redismaster
+    - redisslave2:redisslave
+    - server1:server1
+    - server2:server2
+  ports:
+    - "8090:8080"
+
+##
+## Redis
+##
+redismaster:
+  image: redis:3.0.3
+  command: redis-server /etc/redis.conf
+  volumes:
+    - ./redis-master.conf:/etc/redis.conf:ro
+  ports:
+    - "6379:6379"
+
+redisslave1:
+  image: redis:3.0.3
+  command: redis-server /etc/redis.conf
+  volumes:
+    - ./redis-slave.conf:/etc/redis.conf:ro
+  links:
+    - redismaster:master
+  ports:
+    - "6479:6379"
+
+redisslave2:
+  image: redis:3.0.3
+  command: redis-server /etc/redis.conf
+  volumes:
+    - ./redis-slave.conf:/etc/redis.conf:ro
+  links:
+    - redismaster:master
+  ports:
+    - "6579:6379"
+
+##
+## Upstream servers
+##
+server1:
+  image: node:0.12.7
+  command: /usr/local/bin/node /opt/echo.js
+  volumes:
+    - ".:/opt"
+  ports:
+    - "3001:3000"
+
+server2:
+  image: node:0.12.7
+  command: /usr/local/bin/node /opt/echo.js
+  volumes:
+    - ".:/opt"
+  ports:
+    - "3002:3000"
